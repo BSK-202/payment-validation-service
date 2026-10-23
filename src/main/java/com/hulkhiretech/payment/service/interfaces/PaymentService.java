@@ -1,6 +1,8 @@
 package com.hulkhiretech.payment.service.interfaces;
 
+import com.hulkhiretech.payment.pojo.PaymentReq;
+
 public interface PaymentService {
 
-	void createPayment();
+	String createPayment(PaymentReq paymentReq, String hmacSignature);
 }
