@@ -2,7 +2,6 @@
 package com.hulkhiretech.payment.service.impl;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.Base64;
 
 import javax.crypto.Mac;
