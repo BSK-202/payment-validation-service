@@ -10,15 +10,18 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 import com.hulkhiretech.payment.security.HmacFilter;
 import com.hulkhiretech.payment.service.interfaces.HmacSHA256Service;
+import com.hulkhiretech.payment.util.JsonUtil;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final HmacSHA256Service hmacSHA256Service;
+    private final JsonUtil jsonUtil;
 
-    public SecurityConfig(HmacSHA256Service hmacSHA256Service) {
+    public SecurityConfig(HmacSHA256Service hmacSHA256Service, JsonUtil jsonUtil) {
         this.hmacSHA256Service = hmacSHA256Service;
+        this.jsonUtil = jsonUtil;
     }
 
     @Bean
@@ -26,7 +29,7 @@ public class SecurityConfig {
         http
                 .csrf(crd -> crd.disable())
 
-                .addFilterAfter(new HmacFilter(hmacSHA256Service), LogoutFilter.class)
+                .addFilterAfter(new HmacFilter(hmacSHA256Service, jsonUtil), LogoutFilter.class)
 
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated())

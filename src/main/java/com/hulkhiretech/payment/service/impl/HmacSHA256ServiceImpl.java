@@ -26,15 +26,20 @@ public class HmacSHA256ServiceImpl implements HmacSHA256Service {
 	public String generateSignature(String inputJson) {
 		try {
 			Mac mac = Mac.getInstance(Constant.HMAC_SHA256);
+			log.info("HMAC-SHA256 instance created: {}", mac);
 
 			SecretKeySpec secretKeySpec = new SecretKeySpec(
 					secretKey.getBytes(StandardCharsets.UTF_8),
 					Constant.HMAC_SHA256);
 
+			log.info("SecretKeySpec created with secret key: {}", secretKey);
+
 			mac.init(secretKeySpec);
 
 			byte[] hashSignature = mac.doFinal(
 					inputJson.getBytes(StandardCharsets.UTF_8));
+
+			log.info("Generated HMAC-SHA256 signature: {}", Base64.getEncoder().encodeToString(hashSignature));
 
 			return Base64.getEncoder().encodeToString(hashSignature);
 
@@ -46,10 +51,18 @@ public class HmacSHA256ServiceImpl implements HmacSHA256Service {
 
 	@Override
 	public void verifySignature(String inputJson, String incomingHmacSignature) {
-		String generatedSignature = generateSignature(inputJson);
+		if (incomingHmacSignature == null || incomingHmacSignature.isEmpty()) {
+			throw new RuntimeException("Incoming HMAC signature is null or empty");
+		}
+		try {
+			String generatedSignature = generateSignature(inputJson);
+			log.info("Generated HMAC-SHA256 signature for verification: {}", generatedSignature);
 
-		if (!generatedSignature.equals(incomingHmacSignature)) {
-			throw new IllegalArgumentException("HMAC signature mismatch");
+			if (!generatedSignature.equals(incomingHmacSignature)) {
+				throw new RuntimeException("HMAC signature mismatch");
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to verify HMAC-SHA256 signature", e);
 		}
 	}
 }

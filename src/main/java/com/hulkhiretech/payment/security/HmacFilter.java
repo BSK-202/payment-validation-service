@@ -1,13 +1,16 @@
 package com.hulkhiretech.payment.security;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hulkhiretech.payment.service.interfaces.HmacSHA256Service;
+import com.hulkhiretech.payment.util.JsonUtil;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,8 +23,11 @@ public class HmacFilter extends OncePerRequestFilter {
 
     private final HmacSHA256Service hmacSHA256Service;
 
-    public HmacFilter(HmacSHA256Service hmacSHA256Service) {
+    private final JsonUtil jsonUtil ;
+
+    public HmacFilter(HmacSHA256Service hmacSHA256Service, JsonUtil jsonUtil) {
         this.hmacSHA256Service = hmacSHA256Service;
+        this.jsonUtil = jsonUtil;
     }
 
     @Override
@@ -30,30 +36,37 @@ public class HmacFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws java.io.IOException, ServletException {
 
-        log.info("Starting HMAC signature validation in HmacFilter for request: {} {}", request.getMethod(),
-                request.getRequestURI());
+        WrappedRequest wrappedRequest = new WrappedRequest(request);
 
-        String incomingRequest = request.getHeader("HMAC-Signature");
+        log.info("Starting HMAC signature validation in HmacFilter for request: {} {}", wrappedRequest.getMethod(),
+                wrappedRequest.getRequestURI());
+
+        String incomingRequest = wrappedRequest.getHeader("HMAC-Signature");
         log.info("Incoming HMAC-Signature: {}", incomingRequest);
 
         log.info("hmacSHA256Service instance: {}", hmacSHA256Service);
 
-        //String reqAsJson = " ";// TODO
-        //hmacSHA256Service.verifySignature(reqAsJson, incomingRequest);
+        String requetBody = wrappedRequest.getBody();
+        log.info("Request body as JSON: {}", requetBody);
 
-        //boolean isValid = (incomingRequest != null && !incomingRequest.isEmpty());
-        //log.info("HMAC signature validation result: {}", isValid);// todo
+        String reqAsJson = jsonUtil.prepareFormattedJson(requetBody);
+        log.info("Formatted request body as JSON: {}", reqAsJson);
 
-        //if (!isValid) {
-        //    log.warn("HMAC signature validation failed. Access denied.");
-        //    throw new AccessDeniedException("Access denied");
-        //}
+        hmacSHA256Service.verifySignature(reqAsJson, incomingRequest);
+
+        // boolean isValid = (incomingRequest != null && !incomingRequest.isEmpty());
+        // log.info("HMAC signature validation result: {}", isValid);// todo
+
+        // if (!isValid) {
+        // log.warn("HMAC signature validation failed. Access denied.");
+        // throw new AccessDeniedException("Access denied");
+        // }
 
         log.info("HMAC signature validation passed. Proceeding with the request.");
 
         setAuthenticationInSecurityContext(incomingRequest);
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(wrappedRequest, response);
 
         log.info("Completed processing the request in HmacFilter.");
 
@@ -79,5 +92,7 @@ public class HmacFilter extends OncePerRequestFilter {
 
         log.info("Authentication set in SecurityContextHolder: {}", authentication);
     }
+
+    
 
 }
