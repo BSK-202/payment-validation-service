@@ -90,6 +90,5 @@ public class HmacFilter extends OncePerRequestFilter {
         log.info("Authentication set in SecurityContextHolder: {}", authentication);
     }
 
-    
 
 }
