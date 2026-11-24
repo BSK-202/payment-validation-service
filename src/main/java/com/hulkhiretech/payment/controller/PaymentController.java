@@ -21,6 +21,7 @@ public class PaymentController {
 		this.paymentService = paymentService;
 	}
 
+	// default is 200
 	@PostMapping
 	public String createPayment(
 			@RequestBody PaymentReq paymentReq) {
