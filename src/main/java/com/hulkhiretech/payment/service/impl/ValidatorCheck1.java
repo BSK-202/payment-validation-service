@@ -3,6 +3,7 @@ package com.hulkhiretech.payment.service.impl;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.hulkhiretech.payment.constant.ErrorCodeEnum;
 import com.hulkhiretech.payment.exception.ValidationException;
 import com.hulkhiretech.payment.pojo.PaymentReq;
 import com.hulkhiretech.payment.service.interfaces.BusinessValidator;
@@ -17,12 +18,22 @@ public class ValidatorCheck1 implements BusinessValidator {
 	public void validate(PaymentReq paymentReq) {
 		log.info("Executing validate in ValidatorCheck1 {}: ", paymentReq);
 
-		String name = null;
-		name.length();
+		
+		if( paymentReq.getUser().getFirstName().isBlank()){
+			log.error("Validation failed: Name is null. Throwing ValidationException");
+
+			throw new ValidationException(
+				ErrorCodeEnum.FIRST_NAME_NULL.getErrorCode(),
+				ErrorCodeEnum.FIRST_NAME_NULL.getErrorMessage(),
+				HttpStatus.BAD_REQUEST);
+		}
 
 		if (paymentReq.getUser().getFirstName().contains("TEMP")) {
 
-			throw new ValidationException("1001", "Invalid First Name contains 'TEMP'", HttpStatus.BAD_REQUEST);
+			throw new ValidationException(
+				ErrorCodeEnum.INVALID_FIRST_NAME.getErrorCode(),
+				ErrorCodeEnum.INVALID_FIRST_NAME.getErrorMessage(),
+				 HttpStatus.BAD_REQUEST);
 		}
 	}
 }
