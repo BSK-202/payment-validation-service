@@ -22,7 +22,7 @@ public class HmacFilter extends OncePerRequestFilter {
 
     private final HmacSHA256Service hmacSHA256Service;
 
-    private final JsonUtil jsonUtil ;
+    private final JsonUtil jsonUtil;
 
     public HmacFilter(HmacSHA256Service hmacSHA256Service, JsonUtil jsonUtil) {
         this.hmacSHA256Service = hmacSHA256Service;
@@ -35,14 +35,7 @@ public class HmacFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws java.io.IOException, ServletException {
 
-
         log.info("HmacFilter call to test ");
-        if(true){
-            throw new ValidationException(
-                "10xx",
-                "HmacFilter: test",
-                HttpStatus.INTERNAL_SERVER_ERROR);
-        }
 
         WrappedRequest wrappedRequest = new WrappedRequest(request);
 
@@ -100,7 +93,5 @@ public class HmacFilter extends OncePerRequestFilter {
 
         log.info("Authentication set in SecurityContextHolder: {}", authentication);
     }
-
-    
 
 }

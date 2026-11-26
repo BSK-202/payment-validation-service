@@ -8,9 +8,12 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.hulkhiretech.payment.constant.Constant;
+import com.hulkhiretech.payment.constant.ErrorCodeEnum;
+import com.hulkhiretech.payment.exception.ValidationException;
 import com.hulkhiretech.payment.service.interfaces.HmacSHA256Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -44,25 +47,30 @@ public class HmacSHA256ServiceImpl implements HmacSHA256Service {
 			return Base64.getEncoder().encodeToString(hashSignature);
 
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Failed to generate HMAC-SHA256 signature", e);
+			log.error("Failed to generate HMAC-SHA256 signature", e);
+			throw new ValidationException(
+					ErrorCodeEnum.HMAC_SIGNATURE_GENERATION_FAILED.getErrorCode(),
+					ErrorCodeEnum.HMAC_SIGNATURE_GENERATION_FAILED.getErrorMessage(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@Override
 	public void verifySignature(String inputJson, String incomingHmacSignature) {
 		if (incomingHmacSignature == null || incomingHmacSignature.isEmpty()) {
-			throw new RuntimeException("Incoming HMAC signature is null or empty");
+			throw new ValidationException(
+					ErrorCodeEnum.MISSING_HMAC_SIGNATURE.getErrorCode(),
+					ErrorCodeEnum.MISSING_HMAC_SIGNATURE.getErrorMessage(),
+					HttpStatus.UNAUTHORIZED);
 		}
-		try {
-			String generatedSignature = generateSignature(inputJson);
-			log.info("Generated HMAC-SHA256 signature for verification: {}", generatedSignature);
+		String generatedSignature = generateSignature(inputJson);
+		log.info("Generated HMAC-SHA256 signature for verification: {}", generatedSignature);
 
-			if (!generatedSignature.equals(incomingHmacSignature)) {
-				throw new RuntimeException("HMAC signature mismatch");
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to verify HMAC-SHA256 signature", e);
+		if (!generatedSignature.equals(incomingHmacSignature)) {
+			throw new ValidationException(
+					ErrorCodeEnum.INVALID_HMAC_SIGNATURE.getErrorCode(),
+					ErrorCodeEnum.INVALID_HMAC_SIGNATURE.getErrorMessage(),
+					HttpStatus.UNAUTHORIZED);
 		}
 	}
 }
