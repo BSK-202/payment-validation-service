@@ -6,7 +6,9 @@ import lombok.Getter;
 public enum ErrorCodeEnum {
 	GENERAL_ERROR("1000", "Something went wrong. Please try again later"),
 	INVALID_FIRST_NAME("1001", "Invalid First Name contains 'TEMP'"),
-	FIRST_NAME_NULL("1002", "First name cannot be null");
+	VALIDATOR_CLASS_NOT_FOUND("1002", "No validator class found for the provided name"),
+	JSON_SERIALIZATION_ERROR("1003", "Unable to serialize response"),
+	INVALID_JSON_REQUEST("1004", "Invalid JSON request body");
 
 	private final String errorCode;
 	private final String errorMessage;
@@ -15,6 +17,5 @@ public enum ErrorCodeEnum {
 		this.errorCode = errorCode;
 		this.errorMessage = errorMessage;
 	}
-
 
 }

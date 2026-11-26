@@ -18,22 +18,12 @@ public class ValidatorCheck1 implements BusinessValidator {
 	public void validate(PaymentReq paymentReq) {
 		log.info("Executing validate in ValidatorCheck1 {}: ", paymentReq);
 
-		
-		if( paymentReq.getUser().getFirstName().isBlank()){
-			log.error("Validation failed: Name is null. Throwing ValidationException");
-
-			throw new ValidationException(
-				ErrorCodeEnum.FIRST_NAME_NULL.getErrorCode(),
-				ErrorCodeEnum.FIRST_NAME_NULL.getErrorMessage(),
-				HttpStatus.BAD_REQUEST);
-		}
-
 		if (paymentReq.getUser().getFirstName().contains("TEMP")) {
 
 			throw new ValidationException(
-				ErrorCodeEnum.INVALID_FIRST_NAME.getErrorCode(),
-				ErrorCodeEnum.INVALID_FIRST_NAME.getErrorMessage(),
-				 HttpStatus.BAD_REQUEST);
+					ErrorCodeEnum.INVALID_FIRST_NAME.getErrorCode(),
+					ErrorCodeEnum.INVALID_FIRST_NAME.getErrorMessage(),
+					HttpStatus.BAD_REQUEST);
 		}
 	}
 }

@@ -31,14 +31,14 @@ public class PaymentServiceImpl implements PaymentService {
 		log.info("Starting createPayment in PaymentService");
 		log.info("=====>Validator rule list from properties: {}", validatorRuleList);
 
-		//split the validatorRuleList and put into a linked list
+		// split the validatorRuleList and put into a linked list
 		List<String> validatorRules = List.of(validatorRuleList.split(","));
 
 		validatorRules.forEach(rule -> {
 			log.info("Validator rule: {}", rule.trim());
 
 			Class<? extends BusinessValidator> validatorClass = ValidatorRuleEnum
-			.getValidatorClass(rule);
+					.getValidatorClass(rule);
 
 			BusinessValidator validator = applicationContext.getBean(validatorClass);
 			log.info("Executing validator: {}", validator.getClass().getSimpleName());
@@ -48,12 +48,11 @@ public class PaymentServiceImpl implements PaymentService {
 
 		log.info("All validators executed successfully. Proceeding with payment processing.");
 
-		//TODO: Implement the next mcicroservice call to process the payment after successful validation
-		//Invoke Stripe provider Microservice to process the payment
+		// TODO: Implement the next mcicroservice call to process the payment after
+		// successful validation
+		// Invoke Stripe provider Microservice to process the payment
 
-	
 		return "HMAC signature validation successful. Proceeding with payment processing.";
 	}
 
-	
 }

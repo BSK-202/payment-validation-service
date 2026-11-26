@@ -7,7 +7,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
+import com.hulkhiretech.payment.security.ExceptionHandlerFilter;
 import com.hulkhiretech.payment.security.HmacFilter;
 import com.hulkhiretech.payment.service.interfaces.HmacSHA256Service;
 import com.hulkhiretech.payment.util.JsonUtil;
@@ -29,7 +31,11 @@ public class SecurityConfig {
         http
                 .csrf(crd -> crd.disable())
 
-                .addFilterAfter(new HmacFilter(hmacSHA256Service, jsonUtil), LogoutFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(jsonUtil),
+                        DisableEncodeUrlFilter.class)
+
+                .addFilterAfter(new HmacFilter(hmacSHA256Service, jsonUtil),
+                        LogoutFilter.class)
 
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated())
