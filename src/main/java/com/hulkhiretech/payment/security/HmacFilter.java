@@ -2,10 +2,12 @@ package com.hulkhiretech.payment.security;
 
 import java.util.Collections;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.hulkhiretech.payment.exception.ValidationException;
 import com.hulkhiretech.payment.service.interfaces.HmacSHA256Service;
 import com.hulkhiretech.payment.util.JsonUtil;
 
@@ -20,7 +22,7 @@ public class HmacFilter extends OncePerRequestFilter {
 
     private final HmacSHA256Service hmacSHA256Service;
 
-    private final JsonUtil jsonUtil ;
+    private final JsonUtil jsonUtil;
 
     public HmacFilter(HmacSHA256Service hmacSHA256Service, JsonUtil jsonUtil) {
         this.hmacSHA256Service = hmacSHA256Service;
@@ -32,6 +34,8 @@ public class HmacFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain)
             throws java.io.IOException, ServletException {
+
+        log.info("HmacFilter call to test ");
 
         WrappedRequest wrappedRequest = new WrappedRequest(request);
 
@@ -89,7 +93,5 @@ public class HmacFilter extends OncePerRequestFilter {
 
         log.info("Authentication set in SecurityContextHolder: {}", authentication);
     }
-
-    
 
 }

@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.hulkhiretech.payment.constant.ErrorCodeEnum;
+import com.hulkhiretech.payment.pojo.ErrorResponse;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -12,9 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(ValidationException.class)
-	public ResponseEntity<ValidationErrorResponse> handleValidationException(
+	public ResponseEntity<ErrorResponse> handleValidationException(
 			ValidationException exception) {
-		ValidationErrorResponse response = new ValidationErrorResponse(
+
+		log.error("Validation error occureed. Error code :{}, Error Message:{} ", 
+		               exception.getErrorCode(), exception.getErrorMessage());
+
+		ErrorResponse response = new ErrorResponse(
 				exception.getErrorCode(),
 				exception.getErrorMessage());
 
@@ -22,18 +29,15 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ValidationErrorResponse> handleException(Exception exception) {
+	public ResponseEntity<ErrorResponse> handleException(Exception exception) {
 		log.error("Unhandled exception while processing request", exception);
 
-		ValidationErrorResponse response = new ValidationErrorResponse(
-				"1000",
-				"Something went wrong. Please try again later");
+		ErrorResponse response = new ErrorResponse(
+				ErrorCodeEnum.GENERAL_ERROR.getErrorCode(),
+				ErrorCodeEnum.GENERAL_ERROR.getErrorMessage());
 
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	}
 
-	public record ValidationErrorResponse(
-			String errorCode,
-			String errorMessage) {
-	}
+	
 }

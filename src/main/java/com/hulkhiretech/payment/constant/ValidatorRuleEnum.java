@@ -1,5 +1,8 @@
 package com.hulkhiretech.payment.constant;
 
+import org.springframework.http.HttpStatus;
+
+import com.hulkhiretech.payment.exception.ValidationException;
 import com.hulkhiretech.payment.service.impl.ValidatorCheck1;
 import com.hulkhiretech.payment.service.impl.ValidatorCheck2;
 import com.hulkhiretech.payment.service.interfaces.BusinessValidator;
@@ -35,6 +38,9 @@ public enum ValidatorRuleEnum {
 			}
 		}
 
-		throw new RuntimeException("No validator class found for name: " + validatorName);
+		throw new ValidationException(
+				ErrorCodeEnum.VALIDATOR_CLASS_NOT_FOUND.getErrorCode(),
+				ErrorCodeEnum.VALIDATOR_CLASS_NOT_FOUND.getErrorMessage(),
+				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
